@@ -20,9 +20,7 @@ import {
 import {
 	TextDocument
 } from 'vscode-languageserver-textdocument';
-
-import { extractVariables } from './variables'
-
+import { extractVariables } from './variables';
 
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
@@ -103,7 +101,7 @@ connection.onDidChangeConfiguration(change => {
 		documentSettings.clear();
 	} else {
 		globalSettings = <ExampleSettings>(
-			(change.settings.languageServerExample || defaultSettings)
+			(change.settings.matlabCommentChecker || defaultSettings)
 		);
 	}
 
@@ -119,7 +117,7 @@ function getDocumentSettings(resource: string): Thenable<ExampleSettings> {
 	if (!result) {
 		result = connection.workspace.getConfiguration({
 			scopeUri: resource,
-			section: 'languageServerExample'
+			section: 'matlabCommentChecker'
 		});
 		documentSettings.set(resource, result);
 	}
@@ -146,10 +144,9 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 
 	let problems = 0;
 	let diagnostics: Diagnostic[] = [];
-
-
 	// extract variables
 	const variables = extractVariables(text)
+	console.log(variables)
 	for (let variable of variables) {
 		if (variable.value === '') {
 			// value is empty
@@ -159,7 +156,7 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 					start: textDocument.positionAt(variable.range.start),
 					end: textDocument.positionAt(variable.range.end)
 				},
-				message: `${variable.name} 没有注释`,
+				message: `${variable.name}: no comment`,
 				source: 'Matlab Comment Checker'
 			}
 			// 加入到结果
