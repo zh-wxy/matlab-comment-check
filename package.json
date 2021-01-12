@@ -1,9 +1,10 @@
 {
 	"name": "matlab-comment-checker",
 	"description": "A variable comment chekcer for matlab.",
+	"displayName": "Matlab Comment Checker",
 	"author": "shengdi",
 	"license": "MIT",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"icon": "images/icon.png",
 	"repository": {
 		"type": "git",
