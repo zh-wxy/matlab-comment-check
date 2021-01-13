@@ -20,7 +20,9 @@ import {
 import {
 	TextDocument
 } from 'vscode-languageserver-textdocument';
-import { extractVariables } from './variables';
+import { extractFunction, getHasMapping } from './commentUtils';
+import { isFunction } from './reader';
+import { extractFunctionVariables, extractFunctionVariablesWithoutComment, extractVariables } from './variables';
 
 // Create a connection for the server, using Node's IPC as a transport.
 // Also include all preview / proposed LSP features.
@@ -145,8 +147,14 @@ async function validateTextDocument(textDocument: TextDocument): Promise<void> {
 	let problems = 0;
 	let diagnostics: Diagnostic[] = [];
 	// extract variables
-	const variables = extractVariables(text)
-	console.log(variables)
+	let variables = extractVariables(text)
+	if (isFunction(text)) {
+		const noArr = extractFunctionVariablesWithoutComment(text)
+		variables = variables.concat(noArr)
+	}
+	/**
+	 * 加入到诊断 problems 中
+	 */
 	for (let variable of variables) {
 		if (variable.value === '') {
 			// value is empty

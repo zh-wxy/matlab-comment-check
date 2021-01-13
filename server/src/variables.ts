@@ -1,4 +1,5 @@
 import { LogTraceNotification } from 'vscode-languageserver';
+import { extractFunction, getHasMapping } from './commentUtils';
 import { readContent } from './reader';
 import TextUtils from "./TextUtils";
 
@@ -163,8 +164,22 @@ export function extractFunctionVariables(content: string): FunctionVariable {
   return res
 }
 
-const filePath = 'C:\\Users\\sheng\\Documents\\code\\matlab\\quaternion_matlab\\日常行为分析\\feature_visualize\\feature_range_3d\\get_feature_importance.m'
-// const filePath = 'C:\\Users\\sheng\\Documents\\code\\matlab\\quaternion_matlab\\nine\\lib\\readData.m'
-const content = readContent(filePath)
-const res = extractFunctionVariables(content)
-console.log(res);
+export function extractFunctionVariablesWithoutComment(content: string) : Array<VariableItem> {
+  // 从 function 那一行提取的
+  const functionVariables = extractFunctionVariables(content)
+  // 从最上面的注释提取的
+  const commentFunction = extractFunction(content)
+  // 看一下哪些变量没有注释
+  const paramsMapping = getHasMapping(commentFunction.param)
+  const returnsMapping = getHasMapping(commentFunction.returns)
+  // 没有注释的 function 变量
+  const paramsNo = functionVariables.params.filter(v => !paramsMapping[v.name])
+  const returnsNo = functionVariables.returns.filter(v => !returnsMapping[v.name])
+  const noArr = paramsNo.concat(returnsNo)
+  return noArr
+}
+
+// const filePath = 'C:\\Users\\sheng\\Documents\\code\\matlab\\quaternion_matlab\\日常行为分析\\feature_visualize\\feature_range_3d\\get_feature_importance.m'
+// const content = readContent(filePath)
+// const res = extractFunctionVariablesWithoutComment(content)
+// console.log(res);
