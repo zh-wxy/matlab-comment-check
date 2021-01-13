@@ -178,8 +178,3 @@ export function extractFunctionVariablesWithoutComment(content: string) : Array<
   const noArr = paramsNo.concat(returnsNo)
   return noArr
 }
-
-// const filePath = 'C:\\Users\\sheng\\Documents\\code\\matlab\\quaternion_matlab\\日常行为分析\\feature_visualize\\feature_range_3d\\get_feature_importance.m'
-// const content = readContent(filePath)
-// const res = extractFunctionVariablesWithoutComment(content)
-// console.log(res);
