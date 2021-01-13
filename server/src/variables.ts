@@ -1,5 +1,15 @@
 import TextUtils from "./TextUtils";
 
+function getFunctionLineNumber (content: string) {
+  const functionRegex = /function\s/gm
+  const functionRes = TextUtils.matchAll(content, functionRegex)
+  if (functionRes.length > 0) {
+    return TextUtils.getLineNumber(content, functionRes[0].index)
+  } else {
+    return -1
+  }
+}
+
 export function extractVariables(content: string) {
   const regex = /(\S+)\s*~?=/gm
   let res = TextUtils.matchAll(content, regex)
@@ -17,7 +27,7 @@ export function extractVariables(content: string) {
     }
     return true
   })
-  const variables = res.map(v => {
+  let variables = res.map(v => {
     const lineNumber = TextUtils.getLineNumber(content, v.index)
     let comments = ''
     if (lineNumber > 0) {
@@ -44,8 +54,12 @@ export function extractVariables(content: string) {
       range: {
         start: v.index,
         end: v.index + v[1].length
-      }
+      },
+      lineNumber: lineNumber
     }
   })
+  // 过滤掉 function 这一行的
+  const functionLineNumber = getFunctionLineNumber(content)
+  variables = variables.filter(v => v.lineNumber !== functionLineNumber)
   return variables
 }
